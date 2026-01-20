@@ -1,19 +1,33 @@
 import { Controller, Get } from '@nestjs/common';
 import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { DataSource } from 'typeorm';
+
+import { DbHealthDto, HealthDto } from './dto/health.dto';
 
 @ApiTags('health')
 @Controller('health')
 export class HealthController {
-  @ApiOkResponse({
-    schema: {
-      example: { ok: true, timestamp: '2026-01-20T10:00:00.000Z' },
-    },
-  })
+  constructor(private readonly dataSource: DataSource) {}
+
+  @ApiOkResponse({ type: HealthDto })
   @Get()
-  getHealth() {
-    return {
-      ok: true,
-      timestamp: new Date().toISOString(),
-    };
+  getHealth(): HealthDto {
+    return { ok: true, timestamp: new Date().toISOString() };
+  }
+
+  @ApiOkResponse({ type: DbHealthDto })
+  @Get('db')
+  async getDbHealth(): Promise<DbHealthDto> {
+    try {
+      await this.dataSource.query('SELECT 1');
+      return { ok: true, db: 'up', timestamp: new Date().toISOString() };
+    } catch (e) {
+      return {
+        ok: false,
+        db: 'down',
+        timestamp: new Date().toISOString(),
+        error: e instanceof Error ? e.message : 'unknown error',
+      };
+    }
   }
 }
