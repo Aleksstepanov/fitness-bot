@@ -1,14 +1,15 @@
-import { Body, Controller, Post } from '@nestjs/common';
-import { ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
+import { ApiOkResponse, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { UsersService } from '@/modules/user/users.service';
 import { CheckInsService } from './check-ins.service';
 import { UpsertCheckInDto } from './dto/upsert-check-in.dto';
 import { CheckInResponseDto } from './dto/check-in.response.dto';
 import { mapCheckInToResponse } from './check-ins.mapper';
-import { Get, Query } from '@nestjs/common';
-import { ApiQuery } from '@nestjs/swagger';
 import { CheckInsWeekResponseDto } from './dto/check-ins-week.response.dto';
+import { GetCheckInByDateQueryDto } from './dto/get-check-in-by-date.query.dto';
+import { GetCheckInsRangeQueryDto } from './dto/get-check-ins-range.query.dto';
+import { GetTodayCheckInQueryDto } from './dto/get-today-check-in.query.dto';
 
 @ApiTags('check-ins')
 @Controller('check-ins')
@@ -44,15 +45,14 @@ export class CheckInsController {
   @ApiQuery({ name: 'date', required: true, example: '2026-01-20' })
   @Get('by-date')
   async getByDate(
-    @Query('tgId') tgId: string,
-    @Query('date') date: string,
+    @Query() query: GetCheckInByDateQueryDto,
   ): Promise<CheckInResponseDto | null> {
-    const user = await this.usersService.findByTgId(tgId);
+    const user = await this.usersService.findByTgId(query.tgId);
     if (!user) return null;
 
     const checkIn = await this.checkInsService.findByUserAndDate({
       userId: user.id,
-      checkInDate: date,
+      checkInDate: query.date,
     });
 
     return checkIn ? mapCheckInToResponse(checkIn) : null;
@@ -64,24 +64,22 @@ export class CheckInsController {
   @ApiQuery({ name: 'dateTo', required: true, example: '2026-01-26' })
   @Get('range')
   async getRange(
-    @Query('tgId') tgId: string,
-    @Query('dateFrom') dateFrom: string,
-    @Query('dateTo') dateTo: string,
+    @Query() query: GetCheckInsRangeQueryDto,
   ): Promise<CheckInsWeekResponseDto> {
-    const user = await this.usersService.findByTgId(tgId);
+    const user = await this.usersService.findByTgId(query.tgId);
     if (!user) {
-      return { dateFrom, dateTo, items: [] };
+      return { dateFrom: query.dateFrom, dateTo: query.dateTo, items: [] };
     }
 
     const items = await this.checkInsService.findRangeByUser({
       userId: user.id,
-      dateFrom,
-      dateTo,
+      dateFrom: query.dateFrom,
+      dateTo: query.dateTo,
     });
 
     return {
-      dateFrom,
-      dateTo,
+      dateFrom: query.dateFrom,
+      dateTo: query.dateTo,
       items: items.map(mapCheckInToResponse),
     };
   }
@@ -92,8 +90,8 @@ export class CheckInsController {
   })
   @ApiQuery({ name: 'tgId', required: true, example: '123456789' })
   @Get('today')
-  async getToday(@Query('tgId') tgId: string) {
-    const user = await this.usersService.findByTgId(tgId);
+  async getToday(@Query() query: GetTodayCheckInQueryDto) {
+    const user = await this.usersService.findByTgId(query.tgId);
     if (!user) {
       return null;
     }

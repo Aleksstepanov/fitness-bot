@@ -94,7 +94,7 @@ describe('CheckInsController', () => {
       mockUsersService.findByTgId.mockResolvedValue(mockUser);
       mockCheckInsService.findByUserAndDate.mockResolvedValue(mockCheckIn);
 
-      const result = await controller.getByDate(tgId, date);
+      const result = await controller.getByDate({ tgId, date });
 
       expect(mockUsersService.findByTgId).toHaveBeenCalledWith(tgId);
       expect(mockCheckInsService.findByUserAndDate).toHaveBeenCalledWith({
@@ -107,14 +107,20 @@ describe('CheckInsController', () => {
 
     it('should return null if user not found', async () => {
       mockUsersService.findByTgId.mockResolvedValue(null);
-      const result = await controller.getByDate('123', '2026-01-20');
+      const result = await controller.getByDate({
+        tgId: '123',
+        date: '2026-01-20',
+      });
       expect(result).toBeNull();
     });
 
     it('should return null if check-in not found', async () => {
       mockUsersService.findByTgId.mockResolvedValue({ id: 'user-1' });
       mockCheckInsService.findByUserAndDate.mockResolvedValue(null);
-      const result = await controller.getByDate('123', '2026-01-20');
+      const result = await controller.getByDate({
+        tgId: '123',
+        date: '2026-01-20',
+      });
       expect(result).toBeNull();
     });
   });
@@ -133,7 +139,11 @@ describe('CheckInsController', () => {
       mockUsersService.findByTgId.mockResolvedValue(mockUser);
       mockCheckInsService.findRangeByUser.mockResolvedValue(mockItems);
 
-      const result = await controller.getRange(tgId, from, to);
+      const result = await controller.getRange({
+        tgId,
+        dateFrom: from,
+        dateTo: to,
+      });
 
       expect(result.dateFrom).toBe(from);
       expect(result.items).toHaveLength(2);
@@ -141,7 +151,11 @@ describe('CheckInsController', () => {
 
     it('should return empty list if user not found', async () => {
       mockUsersService.findByTgId.mockResolvedValue(null);
-      const result = await controller.getRange('123', '2026-01-20', '2026-01-21');
+      const result = await controller.getRange({
+        tgId: '123',
+        dateFrom: '2026-01-20',
+        dateTo: '2026-01-21',
+      });
       expect(result.items).toEqual([]);
     });
   });
@@ -155,7 +169,7 @@ describe('CheckInsController', () => {
       mockUsersService.findByTgId.mockResolvedValue(mockUser);
       mockCheckInsService.findTodayByUser.mockResolvedValue(mockCheckIn);
 
-      const result = await controller.getToday(tgId);
+      const result = await controller.getToday({ tgId });
 
       expect(mockUsersService.findByTgId).toHaveBeenCalledWith(tgId);
       expect(mockCheckInsService.findTodayByUser).toHaveBeenCalledWith({
@@ -168,14 +182,14 @@ describe('CheckInsController', () => {
 
     it('should return null if user not found', async () => {
       mockUsersService.findByTgId.mockResolvedValue(null);
-      const result = await controller.getToday('123');
+      const result = await controller.getToday({ tgId: '123' });
       expect(result).toBeNull();
     });
 
     it('should return null if check-in not found', async () => {
       mockUsersService.findByTgId.mockResolvedValue({ id: 'user-1', timezone: 'UTC' });
       mockCheckInsService.findTodayByUser.mockResolvedValue(null);
-      const result = await controller.getToday('123');
+      const result = await controller.getToday({ tgId: '123' });
       expect(result).toBeNull();
     });
   });
