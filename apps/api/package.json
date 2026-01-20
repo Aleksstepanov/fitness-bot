@@ -18,11 +18,11 @@
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
-    "db:migration:show": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only ./node_modules/typeorm/cli.js migration:show -d src/shared/db/data-source.ts",
-    "db:migration:generate": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only ./node_modules/typeorm/cli.js migration:generate src/shared/db/migrations/auto -d src/shared/db/data-source.ts",
-    "db:migration:run": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only ./node_modules/typeorm/cli.js migration:run -d src/shared/db/data-source.ts",
-    "db:migration:revert": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only ./node_modules/typeorm/cli.js migration:revert -d src/shared/db/data-source.ts",
-    "db:schema:log": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only ./node_modules/typeorm/cli.js schema:log -d src/shared/db/data-source.ts"
+    "db:migration:show": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:show -d src/shared/db/data-source.ts",
+    "db:migration:generate": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:generate -d src/shared/db/data-source.ts",
+    "db:migration:run": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:run -d src/shared/db/data-source.ts",
+    "db:migration:revert": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js migration:revert -d src/shared/db/data-source.ts",
+    "db:schema:log": "dotenv -e ../../.env -- node -r ts-node/register/transpile-only -r tsconfig-paths/register ./node_modules/typeorm/cli.js schema:log -d src/shared/db/data-source.ts"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.1",
@@ -31,6 +31,8 @@
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/swagger": "^11.2.5",
     "@nestjs/typeorm": "^11.0.0",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.3",
     "pg": "^8.17.1",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",

@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
+import { UsersModule } from './modules/user/user.module';
+import { CheckInsModule } from './modules/check-ins/check-ins.module';
 import { HealthController } from './health/health.controller';
 
 @Module({
@@ -27,6 +28,8 @@ import { HealthController } from './health/health.controller';
         autoLoadEntities: true,
       }),
     }),
+    UsersModule,
+    CheckInsModule,
   ],
   controllers: [HealthController],
 })
