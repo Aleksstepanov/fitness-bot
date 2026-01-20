@@ -85,4 +85,24 @@ export class CheckInsController {
       items: items.map(mapCheckInToResponse),
     };
   }
+
+  @ApiOkResponse({
+    type: CheckInResponseDto,
+    description: 'Today check-in or null if not exists',
+  })
+  @ApiQuery({ name: 'tgId', required: true, example: '123456789' })
+  @Get('today')
+  async getToday(@Query('tgId') tgId: string) {
+    const user = await this.usersService.findByTgId(tgId);
+    if (!user) {
+      return null;
+    }
+
+    const checkIn = await this.checkInsService.findTodayByUser({
+      userId: user.id,
+      timezone: user.timezone,
+    });
+
+    return checkIn ? mapCheckInToResponse(checkIn) : null;
+  }
 }

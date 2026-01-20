@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Between } from 'typeorm';
-
+import { getLocalDate } from '@/shared/utils/time/get-local-date';
 import { CheckInEntity, ECheckInStatus } from './entities/check-in.entity';
 
 @Injectable()
@@ -56,6 +56,17 @@ export class CheckInsService {
         checkInDate: Between(params.dateFrom, params.dateTo),
       },
       order: { checkInDate: 'ASC' },
+    });
+  };
+
+  findTodayByUser = async (params: { userId: string; timezone: string }) => {
+    const today = getLocalDate(params.timezone);
+
+    return this.checkInsRepo.findOne({
+      where: {
+        userId: params.userId,
+        checkInDate: today,
+      },
     });
   };
 }

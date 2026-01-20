@@ -18,6 +18,14 @@ export class UserEntity {
   @Column({ type: 'text', name: 'username', nullable: true })
   username!: string | null;
 
+  @Column({
+    type: 'text',
+    name: 'timezone',
+    nullable: false,
+    default: 'Europe/Moscow',
+  })
+  timezone!: string;
+
   @CreateDateColumn({ type: 'timestamptz', name: 'created_at' })
   createdAt!: Date;
 }

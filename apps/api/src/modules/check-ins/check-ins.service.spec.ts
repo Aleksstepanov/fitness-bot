@@ -3,6 +3,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CheckInsService } from './check-ins.service';
 import { CheckInEntity, ECheckInStatus } from './entities/check-in.entity';
+import * as timeUtils from '@/shared/utils/time/get-local-date';
 
 describe('CheckInsService', () => {
   let service: CheckInsService;
@@ -83,7 +84,7 @@ describe('CheckInsService', () => {
         checkInDate: '2026-01-20',
         status: ECheckInStatus.DONE,
       };
-      
+
       await service.upsertDailyCheckIn(paramsWithoutNote);
 
       expect(mockRepo.create).toHaveBeenCalledWith(
@@ -114,6 +115,26 @@ describe('CheckInsService', () => {
         },
         order: { checkInDate: 'ASC' },
       });
+    });
+  });
+
+  describe('findTodayByUser', () => {
+    it('should call findOne with today date from getLocalDate', async () => {
+      const params = { userId: 'u1', timezone: 'Europe/Moscow' };
+      const todayDate = '2026-01-20';
+      const getLocalDateSpy = jest.spyOn(timeUtils, 'getLocalDate').mockReturnValue(todayDate);
+
+      await service.findTodayByUser(params);
+
+      expect(getLocalDateSpy).toHaveBeenCalledWith(params.timezone);
+      expect(mockRepo.findOne).toHaveBeenCalledWith({
+        where: {
+          userId: params.userId,
+          checkInDate: todayDate,
+        },
+      });
+
+      getLocalDateSpy.mockRestore();
     });
   });
 });

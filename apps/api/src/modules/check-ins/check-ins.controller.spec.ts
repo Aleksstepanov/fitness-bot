@@ -20,6 +20,7 @@ describe('CheckInsController', () => {
     upsertDailyCheckIn: jest.fn(),
     findByUserAndDate: jest.fn(),
     findRangeByUser: jest.fn(),
+    findTodayByUser: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -84,8 +85,8 @@ describe('CheckInsController', () => {
       const tgId = '123';
       const date = '2026-01-20';
       const mockUser = { id: 'user-1' };
-      const mockCheckIn = { 
-        id: 'ci-1', 
+      const mockCheckIn = {
+        id: 'ci-1',
         checkInDate: date,
         createdAt: new Date()
       };
@@ -142,6 +143,40 @@ describe('CheckInsController', () => {
       mockUsersService.findByTgId.mockResolvedValue(null);
       const result = await controller.getRange('123', '2026-01-20', '2026-01-21');
       expect(result.items).toEqual([]);
+    });
+  });
+
+  describe('getToday', () => {
+    it('should return today check-in if user and check-in exist', async () => {
+      const tgId = '123';
+      const mockUser = { id: 'user-1', timezone: 'Europe/Moscow' };
+      const mockCheckIn = { id: 'ci-today', createdAt: new Date() };
+
+      mockUsersService.findByTgId.mockResolvedValue(mockUser);
+      mockCheckInsService.findTodayByUser.mockResolvedValue(mockCheckIn);
+
+      const result = await controller.getToday(tgId);
+
+      expect(mockUsersService.findByTgId).toHaveBeenCalledWith(tgId);
+      expect(mockCheckInsService.findTodayByUser).toHaveBeenCalledWith({
+        userId: mockUser.id,
+        timezone: mockUser.timezone,
+      });
+      expect(result).toBeDefined();
+      expect(result?.id).toBe(mockCheckIn.id);
+    });
+
+    it('should return null if user not found', async () => {
+      mockUsersService.findByTgId.mockResolvedValue(null);
+      const result = await controller.getToday('123');
+      expect(result).toBeNull();
+    });
+
+    it('should return null if check-in not found', async () => {
+      mockUsersService.findByTgId.mockResolvedValue({ id: 'user-1', timezone: 'UTC' });
+      mockCheckInsService.findTodayByUser.mockResolvedValue(null);
+      const result = await controller.getToday('123');
+      expect(result).toBeNull();
     });
   });
 });
