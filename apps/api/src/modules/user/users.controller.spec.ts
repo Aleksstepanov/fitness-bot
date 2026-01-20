@@ -38,6 +38,7 @@ describe('UsersController', () => {
         id: 'uuid',
         tgId: '123',
         username: 'test',
+        timezone: 'Europe/Moscow',
         createdAt: new Date(),
       } as UserEntity;
 

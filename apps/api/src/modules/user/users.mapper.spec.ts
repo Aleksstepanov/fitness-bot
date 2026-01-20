@@ -8,6 +8,7 @@ describe('users.mapper', () => {
       id: 'uuid',
       tgId: '12345',
       username: 'testuser',
+      timezone: 'Europe/Moscow',
       createdAt: date,
     };
 
@@ -27,6 +28,7 @@ describe('users.mapper', () => {
       id: 'uuid2',
       tgId: '67890',
       username: null,
+      timezone: 'Europe/Moscow',
       createdAt: date,
     };
 

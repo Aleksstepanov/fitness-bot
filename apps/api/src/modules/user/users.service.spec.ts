@@ -36,7 +36,7 @@ describe('UsersService', () => {
   describe('findByTgId', () => {
     it('should call repo.findOne with correct params', async () => {
       const tgId = '123';
-      const user = { id: 'uuid', tgId } as UserEntity;
+      const user = { id: 'uuid', tgId, timezone: 'Europe/Moscow' } as UserEntity;
       mockRepo.findOne.mockResolvedValue(user);
 
       const result = await service.findByTgId(tgId);
@@ -50,7 +50,12 @@ describe('UsersService', () => {
     it('should return existing user if found and username matches', async () => {
       const tgId = '123';
       const username = 'test';
-      const existingUser = { id: 'uuid', tgId, username } as UserEntity;
+      const existingUser = {
+        id: 'uuid',
+        tgId,
+        username,
+        timezone: 'Europe/Moscow',
+      } as UserEntity;
 
       jest.spyOn(service, 'findByTgId').mockResolvedValue(existingUser);
 
@@ -72,6 +77,7 @@ describe('UsersService', () => {
         id: 'uuid',
         tgId,
         username: oldUsername,
+        timezone: 'Europe/Moscow',
       } as UserEntity;
 
       jest.spyOn(service, 'findByTgId').mockResolvedValue(existingUser);
