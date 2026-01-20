@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Between } from 'typeorm';
 
 import { CheckInEntity, ECheckInStatus } from './entities/check-in.entity';
 
@@ -35,5 +36,26 @@ export class CheckInsService {
     });
 
     return this.checkInsRepo.save(created);
+  };
+
+  findByUserAndDate = (params: { userId: string; checkInDate: string }) => {
+    return this.checkInsRepo.findOne({
+      where: { userId: params.userId, checkInDate: params.checkInDate },
+      order: { createdAt: 'DESC' },
+    });
+  };
+
+  findRangeByUser = (params: {
+    userId: string;
+    dateFrom: string;
+    dateTo: string;
+  }) => {
+    return this.checkInsRepo.find({
+      where: {
+        userId: params.userId,
+        checkInDate: Between(params.dateFrom, params.dateTo),
+      },
+      order: { checkInDate: 'ASC' },
+    });
   };
 }

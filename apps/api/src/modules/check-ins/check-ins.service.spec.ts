@@ -12,6 +12,7 @@ describe('CheckInsService', () => {
     findOne: jest.fn(),
     save: jest.fn(),
     create: jest.fn(),
+    find: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -88,6 +89,31 @@ describe('CheckInsService', () => {
       expect(mockRepo.create).toHaveBeenCalledWith(
         expect.objectContaining({ note: null })
       );
+    });
+  });
+
+  describe('findByUserAndDate', () => {
+    it('should call findOne with correct params', async () => {
+      const params = { userId: 'u1', checkInDate: '2026-01-20' };
+      await service.findByUserAndDate(params);
+      expect(mockRepo.findOne).toHaveBeenCalledWith({
+        where: { userId: params.userId, checkInDate: params.checkInDate },
+        order: { createdAt: 'DESC' },
+      });
+    });
+  });
+
+  describe('findRangeByUser', () => {
+    it('should call find with Between operator', async () => {
+      const params = { userId: 'u1', dateFrom: '2026-01-01', dateTo: '2026-01-07' };
+      await service.findRangeByUser(params);
+      expect(mockRepo.find).toHaveBeenCalledWith({
+        where: {
+          userId: params.userId,
+          checkInDate: expect.anything(),
+        },
+        order: { checkInDate: 'ASC' },
+      });
     });
   });
 });
